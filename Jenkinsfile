@@ -15,21 +15,25 @@ pipeline {
 
         stage('Static Code Analysis') {
             parallel {
-                stage('SonarQube Analysis') {
+                stage('SonarQube SAST Analysis') {
                     steps {
-                        script {
-                            // Run SonarQube analysis for the master branch
-                            sh 'sonar-scanner'
+                        withSonarQubeEnv('sonar-scanner') {
+                            sh '''
+                            $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=test \
+                            -Dsonar.java.binaries=. -Dsonar.coverage.exclusions=**/test/** \
+                            -Dsonar.coverage.minimumCoverage=80 -Dsonar.issue.severity=HIGH \
+                            -Dsonar.security.hotspots=true
+                            '''
                         }
                     }
                 }
-                stage('OWASP Dependency Check') {
+
+                stage('OWASP Dependency-Check') {
                     steps {
-                        script {
-                            // Run OWASP Dependency Check for the master branch
-                            sh 'dependency-check --scan . --out ./dependency-check-report.xml'
-                            archiveArtifacts allowEmptyArchive: true, artifacts: 'dependency-check-report.xml'
-                        }
+                        dependencyCheck additionalArguments: '--scan ./ --format ALL', 
+                                        odcInstallation: 'dp', 
+                                        stopBuild: true
+                        dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
                     }
                 }
             }
@@ -66,6 +70,7 @@ pipeline {
                         }
                     }
                 }
+
                 stage('Build API Image') {
                     steps {
                         script {
@@ -90,6 +95,7 @@ pipeline {
                         }
                     }
                 }
+
                 stage('Scan API Image') {
                     steps {
                         script {
@@ -113,6 +119,7 @@ pipeline {
                         }
                     }
                 }
+
                 stage('Push API Image to Prod') {
                     steps {
                         script {
