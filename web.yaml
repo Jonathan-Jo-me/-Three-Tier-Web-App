@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-deployment
+  labels:
+    app: web
+spec:
+  replicas: 1  # Number of replicas to run
+  selector:
+    matchLabels:
+      app: web  # Label selector to match the pods
+  template:
+    metadata:
+      labels:
+        app: web  # Label for identifying the pod in the deployment
+    spec:
+      containers:
+        - name: web-container
+          image: jonathan02/garden:1  # Replace with your actual image name
+          ports:
+            - containerPort: 8080  # The port your application listens on inside the container
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-service  # Name of the service
+spec:
+  selector:
+    app: web  # Selector to identify the pods this service will target
+  ports:
+    - protocol: TCP
+      port: 80  # The port exposed by the service
+      targetPort: 8080  # The port the application inside the container is listening on
+  type: LoadBalancer  # Change to LoadBalancer to expose the service externally
