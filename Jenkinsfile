@@ -1,6 +1,7 @@
 pipeline {
     agent any
     environment {
+        SCANNER_HOME = tool 'sonar-scanner'
         AWS_REGION = 'ap-south-1'
         ECR_REPO_WEB = '836759839628.dkr.ecr.ap-south-1.amazonaws.com/prod/web'
         ECR_REPO_API = '836759839628.dkr.ecr.ap-south-1.amazonaws.com/prod/api'
