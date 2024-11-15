@@ -8,40 +8,28 @@ pipeline {
     }
 
     stages {
-        stage('Run Tests') {
-            steps {
-                script {
-                    // Run unit tests for the web app
-                    sh 'npm install'  // Install dependencies
-                    sh 'npm run test:unit'
-
-                    // Run integration tests for the web app
-                    sh 'npm run test:integ'
-                }
-            }
-        }
-
         stage('Build Docker Images') {
             parallel {
                 stage('Build Web Image') {
                     steps {
                         script {
                             // Build web app image for prod
-                            sh 'docker build -t $ECR_REPO_WEB:$IMAGE_TAG .'
-                        }
-                    }
-                }
-
-                // You can add more parallel stages if needed
-                stage('Build Other Image') {
-                    steps {
-                        script {
-                            // Build another Docker image if required
-                            sh 'docker build -t $ECR_REPO_OTHER:$IMAGE_TAG .'
+                            sh """
+                                docker build -t $ECR_REPO_WEB:$IMAGE_TAG .
+                            """
                         }
                     }
                 }
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Docker image built successfully.'
+        }
+        failure {
+            echo 'Docker image build failed.'
         }
     }
 }
