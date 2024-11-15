@@ -45,6 +45,7 @@ pipeline {
                 script {
                     // Run unit tests for the web app
                     dir('web') {
+                        sh 'npm install'  // Install dependencies
                         sh 'npm run test:unit'
                     }
                     // Run integration tests for the web app
