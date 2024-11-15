@@ -19,7 +19,7 @@ pipeline {
                     steps {
                         withSonarQubeEnv('sonar-scanner') {
                             sh '''
-                            $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=test \
+                            $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=test1 \
                             -Dsonar.java.binaries=. -Dsonar.coverage.exclusions=**/test/** \
                             -Dsonar.coverage.minimumCoverage=80 -Dsonar.issue.severity=HIGH \
                             -Dsonar.security.hotspots=true
